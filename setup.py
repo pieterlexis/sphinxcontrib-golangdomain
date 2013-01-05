@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 long_desc = '''
 This package contains the sphinxcontrib-golangdomain Sphinx extension.
 
-This extension adds Ruby Domain to Sphinx.
+This extension adds Golang Domain to Sphinx.
 It needs Sphinx 1.0 or newer.
 '''
 
