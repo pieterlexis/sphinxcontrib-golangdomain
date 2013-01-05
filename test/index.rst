@@ -90,7 +90,7 @@ Test Case - Access with package name in other packages (dummy_package)
 
 :go:func:`(foo.Bar) MethodEight`
 
-following items should not be linked as current package is 'dummy_package'.
+following items should not be linked to *foo* package since current package is *dummy_package*.
 
 :go:type:`Spam`
 

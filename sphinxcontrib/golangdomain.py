@@ -386,7 +386,7 @@ class GolangDomain(Domain):
     object_types = {
         'function': ObjType(l_('function'), 'func'),
         'package':  ObjType(l_('package'),  'pkg'),
-        'type':     ObjType(l_('function'), 'type'),
+        'type':     ObjType(l_('type'),     'type'),
         'var':      ObjType(l_('variable'), 'data'),
         'const':    ObjType(l_('const'),    'data'),
     }
