@@ -181,13 +181,21 @@ class GolangObject(ObjectDescription):
             signode += paramlist
 
         if retann:
-            signode += addnodes.desc_returns(retann, retann)
+            signode += addnodes.desc_addname(" ", u'\xa0')
+            signode += addnodes.desc_addname(retann, retann)
         return fullname
 
 
     def _get_index_text(self, name):
         if self.objtype == 'function':
-            return _('%s (Golang function)') % name
+            try:
+                methodname, funcname = name.split(' ')
+                # TODO(ymotongpoo): change format of method in index 
+                return _('%s() (Golang function)') % methodname
+            except ValueError:
+                funcname = name.split('.')[1]
+                # TODO(ymotongpoo): change format of function in index 
+                return _('%s() (Golang function)') % funcname
         elif self.objtype == 'variable':
             return _('%s (Golang variable)') % name
         elif self.objtype == 'const':
@@ -205,7 +213,7 @@ class GolangObject(ObjectDescription):
             signode['first'] = (not self.names)
             self.state.document.note_explicit_target(signode)
 
-            if self.objtype =='function':
+            if self.objtype == 'function':
                 finv = self.env.domaindata['go']['functions']
                 if name in finv:
                     self.env.warn(
