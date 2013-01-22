@@ -189,19 +189,21 @@ class GolangObject(ObjectDescription):
     def _get_index_text(self, name):
         if self.objtype == 'function':
             try:
-                methodname, funcname = name.split(' ')
-                # TODO(ymotongpoo): change format of method in index 
-                return _('%s() (Golang function)') % methodname
+                typename, methodname = name.split(' ')
+                typename = typename.strip('()')
+                return _('%s() (%s method)') % (methodname, typename)
             except ValueError:
-                funcname = name.split('.')[1]
-                # TODO(ymotongpoo): change format of function in index 
-                return _('%s() (Golang function)') % funcname
+                package, funcname = name.split('.')
+                return _('%s() (%s package)') % (funcname, package)
         elif self.objtype == 'variable':
-            return _('%s (Golang variable)') % name
+            package, varname = name.split('.')
+            return _('%s (%s package)') % (varname, package)
         elif self.objtype == 'const':
-            return _('%s (Golang const)') % name
+            package, constname = name.split('.')
+            return _('%s (%s package)') % (constname, package)
         elif self.objtype == 'type':
-            return _('%s (Golang type)') % name
+            package, typename = name.split('.')
+            return _('%s (%s package)') % (typename, package)
         else:
             return ''
 
@@ -234,7 +236,8 @@ class GolangObject(ObjectDescription):
 
         indextext = self._get_index_text(name)
         if indextext:
-            self.indexnode['entries'].append(('single', indextext, name, name))
+            # TODO(ymotongpoo): check in which case append() requires 4th arg.
+            self.indexnode['entries'].append(('single', indextext, name, ''))
 
 
 class GolangPackage(Directive):

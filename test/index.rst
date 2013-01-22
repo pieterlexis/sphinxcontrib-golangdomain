@@ -58,7 +58,7 @@ Test Case - Access without package name in the same package
 
 :go:data:`VariableTest`
 
-:go:type:`Spam`
+:go:type:`Foo`
 
 :go:func:`FuncOne`
 
