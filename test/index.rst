@@ -9,16 +9,16 @@ acceptance test of golangdomain
 Go language
 -----------
 
-Package 'foo'
-~~~~~~~~~~~~~
+Package 'spam'
+~~~~~~~~~~~~~~
 
-.. go:package:: foo
+.. go:package:: spam
 
 .. go:const:: ConstTest
 
 .. go:var:: VariableTest
 
-.. go:type:: Spam
+.. go:type:: Foo
 
 .. go:function:: func FuncOne()
 
@@ -58,7 +58,7 @@ Test Case - Access without package name in the same package
 
 :go:data:`VariableTest`
 
-:go:type:`Spam`
+:go:type:`Foo`
 
 :go:func:`FuncOne`
 
@@ -72,27 +72,27 @@ Test Case - Access without package name in the same package
 Test Case - Access with package name in other packages (dummy_package)
 ----------------------------------------------------------------------
 
-.. go:type:: Spam
+.. go:type:: Foo
 
 .. go:function:: func FuncOne()
 
-:go:pkg:`foo`
+:go:pkg:`spam`
 
-:go:data:`foo.ConstTest`
+:go:data:`spam.ConstTest`
 
-:go:data:`foo.VariableTest`
+:go:data:`spam.VariableTest`
 
-:go:type:`foo.Spam`
+:go:type:`spam.Foo`
 
-:go:func:`foo.FuncOne`
+:go:func:`spam.FuncOne`
 
-:go:func:`(foo.Foo) MethodOne`
+:go:func:`(spam.Foo) MethodOne`
 
-:go:func:`(foo.Bar) MethodEight`
+:go:func:`(spam.Bar) MethodEight`
 
 following items should not be linked to *foo* package since current package is *dummy_package*.
 
-:go:type:`Spam`
+:go:type:`Foo`
 
 :go:func:`FuncOne`
 

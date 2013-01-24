@@ -181,19 +181,29 @@ class GolangObject(ObjectDescription):
             signode += paramlist
 
         if retann:
-            signode += addnodes.desc_returns(retann, retann)
+            signode += addnodes.desc_addname(" ", u'\xa0')
+            signode += addnodes.desc_addname(retann, retann)
         return fullname
 
 
     def _get_index_text(self, name):
         if self.objtype == 'function':
-            return _('%s (Golang function)') % name
+            try:
+                typename, methodname = name.split(' ')
+                typename = typename.strip('()')
+                return _('%s() (%s method)') % (methodname, typename)
+            except ValueError:
+                package, funcname = name.split('.')
+                return _('%s() (%s package)') % (funcname, package)
         elif self.objtype == 'variable':
-            return _('%s (Golang variable)') % name
+            package, varname = name.split('.')
+            return _('%s (%s package)') % (varname, package)
         elif self.objtype == 'const':
-            return _('%s (Golang const)') % name
+            package, constname = name.split('.')
+            return _('%s (%s package)') % (constname, package)
         elif self.objtype == 'type':
-            return _('%s (Golang type)') % name
+            package, typename = name.split('.')
+            return _('%s (%s package)') % (typename, package)
         else:
             return ''
 
@@ -205,7 +215,7 @@ class GolangObject(ObjectDescription):
             signode['first'] = (not self.names)
             self.state.document.note_explicit_target(signode)
 
-            if self.objtype =='function':
+            if self.objtype == 'function':
                 finv = self.env.domaindata['go']['functions']
                 if name in finv:
                     self.env.warn(
@@ -226,7 +236,8 @@ class GolangObject(ObjectDescription):
 
         indextext = self._get_index_text(name)
         if indextext:
-            self.indexnode['entries'].append(('single', indextext, name, name))
+            # TODO(ymotongpoo): check in which case append() requires 4th arg.
+            self.indexnode['entries'].append(('single', indextext, name, ''))
 
 
 class GolangPackage(Directive):
@@ -348,7 +359,7 @@ class GolangPackageIndex(Index):
 
             entries = content.setdefault(pkgname[0].lower(), [])
 
-            package = pkgname.split('.')[0]
+            package = pkgname.split('/')[0]
             if package != pkgname:
                 # it's a subpackage
                 if prev_pkgname == package:
@@ -384,11 +395,11 @@ class GolangDomain(Domain):
     name = 'go'
     label = 'Golang'
     object_types = {
-        'function': ObjType(l_('function'), 'func'),
-        'package':  ObjType(l_('package'),  'pkg'),
-        'type':     ObjType(l_('type'),     'type'),
-        'var':      ObjType(l_('variable'), 'data'),
-        'const':    ObjType(l_('const'),    'data'),
+        'function': ObjType(l_('function'), 'func', 'obj'),
+        'package':  ObjType(l_('package'),  'pkg', 'obj'),
+        'type':     ObjType(l_('type'),     'type', 'obj'),
+        'var':      ObjType(l_('variable'), 'data', 'obj'),
+        'const':    ObjType(l_('const'),    'data', 'obj'),
     }
 
     directives = {
@@ -404,6 +415,7 @@ class GolangDomain(Domain):
         'pkg':    GolangXRefRole(),
         'type':   GolangXRefRole(),
         'data':   GolangXRefRole(),
+        'obj':    GolangXRefRole(),
     }
     initial_data = {
         'objects': {},    # fullname -> docname, objtype
@@ -466,9 +478,10 @@ class GolangDomain(Domain):
 
     def resolve_xref(self, env, fromdocname, builder,
                      typ, target, node, contnode):
-        if typ == 'pkg' and target in self.data['packages']:
+        if (typ == 'pkg' or 
+            typ == 'obj' and target in self.data['packages']):
             docname, synopsis, platform, deprecated = \
-                self.data['packages'].get(target, ('','','', ''))
+                self.data['packages'].get(target, ('','','',''))
             if not docname:
                 return None
             else:
@@ -488,6 +501,8 @@ class GolangDomain(Domain):
 
 
     def get_objects(self):
+        for pkgname, info in self.data['packages'].iteritems():
+            yield (pkgname, pkgname, 'package', info[0], 'package-' + pkgname, 0)
         for refname, (docname, type) in self.data['objects'].iteritems():
             yield (refname, refname, type, docname, refname, 1)
 
